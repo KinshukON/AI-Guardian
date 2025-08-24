@@ -1,0 +1,167 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  role         UserRole
+  displayName  String
+  mfaEnabled   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  children     Child[]
+  policies     Policy[]
+  consents     Consent[]
+  auditLogs    AuditLog[]
+  events       Event[]
+
+  @@map("users")
+}
+
+model Child {
+  id         String   @id @default(cuid())
+  userId     String
+  displayName String
+  ageBand    AgeBand
+  values     Json     // Values profile as JSON
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events     Event[]
+  analyses   Analysis[]
+  summaries  Summary[]
+
+  @@map("children")
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  childId   String
+  userId    String
+  type      EventType
+  source    String
+  uri       String?
+  startedAt DateTime
+  endedAt   DateTime?
+  meta      Json?    // Additional metadata
+  createdAt DateTime @default(now())
+
+  // Relations
+  child     Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analyses  Analysis[]
+
+  @@map("events")
+}
+
+model Analysis {
+  id           String   @id @default(cuid())
+  eventId      String
+  safetyScore  Int      // 0-100
+  qualityScore Int      // 0-100
+  biasScore    Int      // 0-100
+  bias         Json?    // Detailed bias analysis
+  evidence     Json?    // Evidence snippets
+  confidence   Float    // 0.0-1.0
+  createdAt    DateTime @default(now())
+
+  // Relations
+  event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("analyses")
+}
+
+model Summary {
+  id          String   @id @default(cuid())
+  childId     String
+  periodStart DateTime
+  periodEnd   DateTime
+  digest      Json     // Summary data
+  pdfPath     String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  child       Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("summaries")
+}
+
+model Policy {
+  id            String   @id @default(cuid())
+  userId        String
+  profile       Json     // Policy configuration
+  retentionDays Int      @default(30)
+  whitelist     String[] @default([])
+  graylist      String[] @default([])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("policies")
+}
+
+model Consent {
+  id        String   @id @default(cuid())
+  userId    String
+  childId   String?
+  scope     String
+  grantedAt DateTime @default(now())
+  revokedAt DateTime?
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("consents")
+}
+
+model AuditLog {
+  id       String   @id @default(cuid())
+  actorId  String
+  action   String
+  target   String
+  meta     Json?
+  createdAt DateTime @default(now())
+
+  // Relations
+  actor    User     @relation(fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+enum UserRole {
+  PARENT
+  EDUCATOR
+  TEEN
+  ADMIN
+}
+
+enum AgeBand {
+  AGE_8_10
+  AGE_11_13
+  AGE_14_16
+  AGE_17_PLUS
+}
+
+enum EventType {
+  VIDEO
+  TEXT
+  CHAT
+  APP
+  WEBSITE
+} 

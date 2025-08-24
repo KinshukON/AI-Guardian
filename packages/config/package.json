@@ -1,0 +1,20 @@
+{
+  "name": "@aiguardian/config",
+  "version": "0.1.0",
+  "description": "Shared configuration for AI Guardian",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "tailwind.config.js",
+    "tsconfig.json",
+    "eslint.config.js"
+  ],
+  "scripts": {
+    "build": "echo 'Config package - no build needed'",
+    "dev": "echo 'Config package - no dev needed'"
+  },
+  "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
+    "@tailwindcss/typography": "^0.5.16"
+  }
+}
