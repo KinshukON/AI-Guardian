@@ -44,6 +44,12 @@ model Child {
   events     Event[]
   analyses   Analysis[]
   summaries  Summary[]
+  
+  // NEW: Enhanced Feature Relations (Additive)
+  riskAssessments    RiskAssessment[]
+  emotionalStates    EmotionalState[]
+  behavioralPatterns BehavioralPattern[]
+  interventionLogs   InterventionLog[]
 
   @@map("children")
 }
@@ -64,6 +70,9 @@ model Event {
   child     Child     @relation(fields: [childId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   analyses  Analysis[]
+  
+  // NEW: Enhanced Feature Relations (Additive)
+  riskAssessments RiskAssessment[]
 
   @@map("events")
 }
@@ -81,6 +90,10 @@ model Analysis {
 
   // Relations
   event       Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  // NEW: Enhanced Feature Relations (Additive)
+  culturalBiasAnalysis CulturalBiasAnalysis?
+  enhancedAnalysis     EnhancedAnalysis?
 
   @@map("analyses")
 }
@@ -164,4 +177,180 @@ enum EventType {
   CHAT
   APP
   WEBSITE
+}
+
+// NEW: Enhanced Risk Assessment Tables (Additive - Backward Compatible)
+model RiskAssessment {
+  id                   String   @id @default(cuid())
+  childId              String
+  eventId              String?
+  compositeRiskScore   Float    // 0.0-1.0
+  riskLevel            RiskLevel
+  contentSafetyRisk    Float    // 0.0-1.0
+  behavioralRisk       Float    // 0.0-1.0
+  temporalRisk         Float    // 0.0-1.0
+  emotionalRisk        Float    // 0.0-1.0
+  cumulativeRisk       Float    // 0.0-1.0
+  riskFactors          Json     // Detailed risk factor analysis
+  interventionTriggers Json     // Intervention recommendations
+  riskTrend            String   // "increasing", "stable", "decreasing"
+  predictionConfidence Float    // 0.0-1.0
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  // Relations
+  child                Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  event                Event?   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@map("risk_assessments")
+}
+
+model EmotionalState {
+  id                   String   @id @default(cuid())
+  childId              String
+  sessionId            String?
+  primaryEmotion       EmotionType
+  confidence           Float    // 0.0-1.0
+  emotionalIndicators  Json     // List of detected emotional indicators
+  crisisLevel          CrisisLevel
+  supportNeeded        Boolean  @default(false)
+  interventionRequired Boolean  @default(false)
+  parentNotified       Boolean  @default(false)
+  notificationUrgency  String?  // "immediate", "within_24_hours", "within_week"
+  moodContext          Json?    // Additional mood context data
+  createdAt            DateTime @default(now())
+
+  // Relations
+  child                Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("emotional_states")
+}
+
+model BehavioralPattern {
+  id                   String   @id @default(cuid())
+  childId              String
+  patternType          String   // "session_duration", "daily_frequency", "content_diversity"
+  value                Float    // Pattern value
+  trend                String   // "increasing", "stable", "decreasing"
+  riskScore            Float    // 0.0-1.0
+  confidence           Float    // 0.0-1.0
+  weekStart            DateTime // Week this pattern data represents
+  weekEnd              DateTime
+  metadata             Json?    // Additional pattern metadata
+  createdAt            DateTime @default(now())
+
+  // Relations
+  child                Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("behavioral_patterns")
+}
+
+model CulturalBiasAnalysis {
+  id                   String   @id @default(cuid())
+  analysisId           String   @unique
+  culturalContext      String   // "western", "eastern", "indigenous", "global_south"
+  representationScore  Float    // 0.0-1.0
+  culturalMarkers      Json     // Detected cultural markers
+  missingPerspectives  Json     // Array of missing cultural perspectives
+  biasIndicators       Json     // Array of cultural bias indicators
+  sensitivityScore     Float    // 0.0-1.0
+  underrepresentedGroups Json   // Array of underrepresented groups
+  balancedPerspectives Json     // Generated balanced perspectives
+  perspectiveSynthesis Json     // Synthesized missing perspectives
+  createdAt            DateTime @default(now())
+
+  // Relations
+  analysis             Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@map("cultural_bias_analyses")
+}
+
+model InterventionLog {
+  id                   String   @id @default(cuid())
+  childId              String
+  interventionType     String   // "content_break", "parent_notification", "crisis_intervention"
+  triggerReason        String
+  riskLevel            RiskLevel
+  urgency              Int      // 1-10 scale
+  status               InterventionStatus
+  recommendedActions   Json     // Array of recommended actions
+  actualActions        Json?    // Array of actions taken
+  effectiveness        Float?   // 0.0-1.0 (measured after intervention)
+  parentNotified       Boolean  @default(false)
+  professionalReferral Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  resolvedAt           DateTime?
+
+  // Relations
+  child                Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("intervention_logs")
+}
+
+model FeatureFlags {
+  id                   String   @id @default(cuid())
+  flagName             String   @unique
+  enabled              Boolean  @default(false)
+  rolloutPercentage    Int      @default(0) // 0-100
+  targetAgeGroups      String[] @default([]) // Age groups to enable for
+  description          String?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@map("feature_flags")
+}
+
+// NEW: Enhanced Analysis Extensions (Additive)
+model EnhancedAnalysis {
+  id                   String   @id @default(cuid())
+  analysisId           String   @unique
+  enhancedBiasScore    Float?   // Enhanced bias detection score
+  intersectionalFactors Json?   // Intersectional bias analysis
+  predictiveRiskScore  Float?   // Predictive risk assessment
+  emotionalContext     Json?    // Emotional context analysis
+  algorithmVersion     String   @default("1.0.0")
+  confidence           Float    @default(0.85)
+  processingTime       Int?     // Processing time in milliseconds
+  featureFlags         Json?    // Feature flags used during analysis
+  createdAt            DateTime @default(now())
+
+  // Relations
+  analysis             Analysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@map("enhanced_analyses")
+}
+
+// NEW: Enums for Enhanced Features
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum EmotionType {
+  HAPPY
+  SAD
+  FRUSTRATED
+  ANXIOUS
+  EXCITED
+  ANGRY
+  CONFUSED
+  NEUTRAL
+}
+
+enum CrisisLevel {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum InterventionStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ESCALATED
 } 

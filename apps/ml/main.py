@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import uvicorn
 import os
+from datetime import datetime
 from dotenv import load_dotenv
 
 from services.content_analyzer import ContentAnalyzer
@@ -82,7 +83,8 @@ class ContentAnalysisResponse(BaseModel):
 class KidGPTRequest(BaseModel):
     message: str
     mode: str  # 'homework', 'curiosity', 'resilience', 'digital'
-    child_age: int
+    child_id: Optional[str] = None
+    child_age: Optional[int] = None
     explain_like_12: bool = False
 
 class KidGPTResponse(BaseModel):
@@ -184,11 +186,11 @@ async def ask_kidgpt(
         logger.info(f"KidGPT request in mode: {request.mode}")
         
         # Get KidGPT response
-        response = await kidgpt_service.get_response(
+        response = await kidgpt_service.generate_response(
             message=request.message,
             mode=request.mode,
-            child_age=request.child_age,
-            explain_like_12=request.explain_like_12
+            child_age=request.child_age or 12,
+            child_id=request.child_id
         )
         
         return response

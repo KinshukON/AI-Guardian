@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Button, Card, CardHeader, CardTitle, CardContent, ScoreRing, SafetyBadge, ConfidenceBadge } from '@aiguardian/ui'
+import { Button, Card, CardHeader, CardTitle, CardContent, ScoreRing, SafetyBadge, ConfidenceBadge, Badge } from '@aiguardian/ui'
 import { useAuth } from '../contexts/AuthContext'
-import { Search, Link as LinkIcon, FileText, MessageSquare, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
+import { Search, Link as LinkIcon, FileText, MessageSquare, AlertTriangle, CheckCircle, XCircle, Eye, Users, Globe, TrendingUp, BookOpen, Shield } from 'lucide-react'
 
 interface AnalysisResult {
   safety: {
@@ -26,6 +26,48 @@ interface AnalysisResult {
   }
   ageFit: string
   recommendations: string[]
+  
+  // NEW: Enhanced features (optional for progressive enhancement)
+  enhanced_bias_analysis?: {
+    cultural_analysis?: {
+      cultural_context: string
+      representation_score: number
+      cultural_markers: string[]
+      missing_perspectives: string[]
+      underrepresented_groups: string[]
+    }
+    intersectional_factors?: any
+    balanced_perspectives?: {
+      primary_perspective: {
+        summary: string
+        evidence: string[]
+      }
+      alternative_perspective: {
+        summary: string
+        evidence: string[]
+        missing_voices: string[]
+      }
+      synthesis: {
+        balanced_summary: string
+        teaching_moments: string[]
+        discussion_points: string[]
+      }
+    }
+    perspective_synthesis?: any
+  }
+  risk_assessment?: {
+    composite_risk_score: number
+    risk_level: string
+    risk_factors: {
+      content_safety: number
+      behavioral_pattern: number
+      temporal_factor: number
+      emotional_indicator: number
+      cumulative_exposure: number
+    }
+    intervention_triggers: any[]
+    recommendations: string[]
+  }
 }
 
 export const ContentAnalyzer: React.FC = () => {
@@ -35,6 +77,11 @@ export const ContentAnalyzer: React.FC = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [result, setResult] = useState<AnalysisResult | null>(null)
   const [showExplainLike12, setShowExplainLike12] = useState(false)
+  
+  // NEW: Enhanced features state
+  const [showEnhancedFeatures, setShowEnhancedFeatures] = useState(true)
+  const [culturalContext, setCulturalContext] = useState('western')
+  const [activeTab, setActiveTab] = useState<'overview' | 'perspectives' | 'risk' | 'cultural'>('overview')
 
   const handleAnalyze = async () => {
     if (!input.trim()) return
@@ -69,7 +116,52 @@ export const ContentAnalyzer: React.FC = () => {
           'Consider watching together to discuss themes',
           'Good opportunity to talk about representation in media',
           'Content is age-appropriate with parental guidance'
-        ]
+        ],
+        
+        // NEW: Enhanced features mock data
+        enhanced_bias_analysis: showEnhancedFeatures ? {
+          cultural_analysis: {
+            cultural_context: culturalContext,
+            representation_score: 0.65,
+            cultural_markers: ['western storytelling', 'individualistic themes', 'urban setting'],
+            missing_perspectives: ['collectivist viewpoints', 'rural perspectives', 'non-western cultural elements'],
+            underrepresented_groups: ['indigenous voices', 'global south perspectives']
+          },
+          balanced_perspectives: {
+            primary_perspective: {
+              summary: 'The content presents a heroic narrative focused on individual achievement and overcoming challenges through personal determination.',
+              evidence: ['Protagonist solves problems independently', 'Success attributed to personal qualities', 'Individual choice emphasized over community input']
+            },
+            alternative_perspective: {
+              summary: 'Alternative viewpoints might emphasize community support, collaborative problem-solving, and collective responsibility for outcomes.',
+              evidence: ['Community-based solutions could be explored', 'Mentorship and guidance from elders could be highlighted', 'Shared responsibility for challenges could be discussed'],
+              missing_voices: ['Community leaders', 'Different cultural backgrounds', 'Collaborative approaches']
+            },
+            synthesis: {
+              balanced_summary: 'While individual determination is valuable, incorporating diverse perspectives on problem-solving and community support can provide a more complete understanding.',
+              teaching_moments: ['Discuss different ways people solve problems across cultures', 'Explore the balance between independence and seeking help'],
+              discussion_points: ['How might this story be different in other cultures?', 'What role does community play in overcoming challenges?']
+            }
+          }
+        } : undefined,
+        
+        risk_assessment: showEnhancedFeatures && selectedChild ? {
+          composite_risk_score: 0.35,
+          risk_level: 'medium',
+          risk_factors: {
+            content_safety: 0.25,
+            behavioral_pattern: 0.45,
+            temporal_factor: 0.30,
+            emotional_indicator: 0.20,
+            cumulative_exposure: 0.40
+          },
+          intervention_triggers: [],
+          recommendations: [
+            'Consider taking a break after 45 minutes',
+            'Good time to discuss the themes with your child',
+            'Monitor for emotional responses during intense scenes'
+          ]
+        } : undefined
       }
       
       setResult(mockResult)

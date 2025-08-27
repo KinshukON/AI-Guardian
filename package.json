@@ -4,6 +4,11 @@
   "description": "AI Guardian - Digital Mentor & Watchdog for Kids",
   "private": true,
   "scripts": {
+    "start": "./start-all.sh",
+    "stop": "./stop-all.sh",
+    "status": "./quick-status.sh",
+    "detailed-status": "./status.sh",
+    "restart": "./restart-service.sh",
     "dev": "pnpm --parallel --recursive run dev",
     "build": "pnpm --recursive run build",
     "test": "pnpm --recursive run test",
