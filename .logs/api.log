@@ -1,0 +1,8 @@
+
+> @aiguardian/api@0.1.0 dev /Users/kinshuk.dutta/AIGuardian/apps/api
+> tsx watch src/index.ts
+
+Database connected (mock)
+{"level":30,"time":1756297251704,"pid":24926,"hostname":"MLH7YCY3N970","msg":"Server listening at http://0.0.0.0:8000"}
+🚀 AI Guardian API server running on http://0.0.0.0:8000
+📚 API documentation available at http://0.0.0.0:8000/docs

@@ -1,0 +1,148 @@
+# AI Guardian 🛡️
+
+**Digital Mentor & Watchdog for Kids**
+
+AI Guardian is a values-aligned companion that analyzes the quality, safety, bias, and emotional impact of AI-powered content used by kids. It guides parents and educators with transparent explanations and promotes healthy learning habits.
+
+## 🎯 North Star
+
+Keep kids safe, curious, and thriving with AI—without surveillance and with parental transparency & control.
+
+## 🚀 Quick Start (10 minutes to demo)
+
+```bash
+# Clone and setup
+git clone <your-repo>
+cd AIGuardian
+pnpm install
+
+# Start all services
+pnpm dev
+
+# In another terminal, seed the database
+pnpm seed
+```
+
+Visit `http://localhost:3000` to see the demo!
+
+## 🎭 Demo Script (5 minutes)
+
+1. **Toggle Kid Profile**: Switch between age bands (8-10, 11-13, 14-16) with different values
+2. **Analyze Content**: Paste a YouTube link → see live Safety/Quality/Bias scores with evidence
+3. **Teach Balance**: Hit "Teach Balance" → get dual-sided summary with citations
+4. **Ask KidGPT**: Ask a homework question → safe, cited response + "explain like I'm 12" toggle
+5. **Dashboard**: Open Guardian Dashboard → digest + quick actions → Generate Weekly Report
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React Web     │    │   Node.js API   │    │  Python ML      │
+│   (Port 3000)   │◄──►│   (Port 8000)   │◄──►│  (Port 8001)   │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │                       ▼                       │
+         │              ┌─────────────────┐              │
+         │              │   PostgreSQL    │              │
+         │              │   (Port 5432)   │              │
+         │              └─────────────────┘              │
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Browser       │    │   Redis Cache   │    │   S3 Storage    │
+│   Extension     │    │   (Port 6379)   │    │   (Reports)     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+## 🎨 Design System
+
+- **Colors**: Deep Navy (#0F172A), Azure Blue (#2563EB), Spring Mint (#A7F3D0), Sand (#F1F5F9), True White (#FFFFFF)
+- **Typography**: Inter (UI) + Source Serif Pro (explanations)
+- **Components**: Rounded-2xl cards, soft shadows, 8px grid, gentle animations
+
+## 🔒 Privacy & Security
+
+- Privacy by design with data minimization
+- Row-level security (parents only access their child's data)
+- Consent-led data processing
+- No keystroke logging or covert monitoring
+- COPPA/FERPA aware architecture
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+pnpm test
+
+# E2E tests
+pnpm test:e2e
+
+# Type checking
+pnpm typecheck
+```
+
+## 📊 Performance Targets
+
+- **CWV**: LCP <2.0s, TTI <3.0s (mid-tier mobile)
+- **Lighthouse**: ≥95 (PWA, a11y, best practices)
+- **Test Coverage**: ≥80%
+- **Accessibility**: WCAG 2.2 AA
+
+## 🚧 Development
+
+```bash
+# Start specific services
+pnpm --filter web dev          # React app only
+pnpm --filter api dev          # Node API only
+pnpm --filter ml dev           # ML service only
+
+# Database operations
+pnpm db:reset                  # Reset database
+pnpm seed                      # Seed with sample data
+
+# Docker operations
+pnpm docker:up                 # Start all services
+pnpm docker:down               # Stop all services
+```
+
+## 📁 Project Structure
+
+```
+AIGuardian/
+├── apps/
+│   ├── web/                   # React frontend
+│   ├── api/                   # Node.js backend
+│   └── ml/                    # Python ML service
+├── packages/
+│   ├── ui/                    # Design system
+│   └── config/                # Shared configs
+├── infra/                     # Infrastructure
+├── docs/                      # Documentation
+└── docker-compose.yml         # Local development
+```
+
+## 🔮 Roadmap
+
+- **v1.0**: Digital Wellbeing Coach, KidGPT, School Portal
+- **v2.0**: Mobile app, Screen Time Agreements
+- **v3.0**: Community patterns, federation, SSO
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 📄 License
+
+[Your License Here]
+
+## 🆘 Support
+
+For questions or issues, please open a GitHub issue or contact the team.
+
+---
+
+**Built with ❤️ for the next generation of digital citizens** 

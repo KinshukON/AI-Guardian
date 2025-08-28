@@ -27,9 +27,11 @@ interface AuthContextType {
   user: User | null
   userChildren: Child[]
   selectedChild: Child | null
+  setupCompleted: boolean
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   selectChild: (child: Child) => void
+  completeSetup: () => void
   isAuthenticated: boolean
 }
 
@@ -51,74 +53,152 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null)
   const [userChildren, setUserChildren] = useState<Child[]>([])
   const [selectedChild, setSelectedChild] = useState<Child | null>(null)
+  const [setupCompleted, setSetupCompleted] = useState(false)
 
-  // Mock data for demo
+  // For development - remove this and uncomment above for production
   useEffect(() => {
-    const mockUser: User = {
-      id: '1',
-      email: 'parent@example.com',
-      role: 'parent',
-      displayName: 'Sarah Johnson',
-      mfaEnabled: true,
-      createdAt: '2024-01-01T00:00:00Z',
-    }
-
-    const mockChildren: Child[] = [
-      {
+    // Check if we should auto-login for demo
+    const demoMode = localStorage.getItem('aiguardian_demo_mode')
+    if (demoMode === 'true') {
+      const mockUser: User = {
         id: '1',
-        displayName: 'Emma',
-        ageBand: '8-10',
-        values: {
-          empathy: 85,
-          curiosity: 90,
-          balancedViews: 75,
-          growthMindset: 80,
-        },
-      },
-      {
-        id: '2',
-        displayName: 'Liam',
-        ageBand: '11-13',
-        values: {
-          empathy: 70,
-          curiosity: 95,
-          balancedViews: 60,
-          growthMindset: 85,
-        },
-      },
-    ]
+        email: 'parent@example.com',
+        role: 'parent',
+        displayName: 'Sarah Johnson',
+        mfaEnabled: true,
+        createdAt: '2024-01-01T00:00:00Z',
+      }
 
-    setUser(mockUser)
-    setUserChildren(mockChildren)
-    setSelectedChild(mockChildren[0])
+      const mockChildren: Child[] = [
+        {
+          id: '1',
+          displayName: 'Emma',
+          ageBand: '8-10',
+          values: {
+            empathy: 85,
+            curiosity: 90,
+            balancedViews: 75,
+            growthMindset: 80,
+          },
+        },
+        {
+          id: '2',
+          displayName: 'Liam',
+          ageBand: '11-13',
+          values: {
+            empathy: 70,
+            curiosity: 95,
+            balancedViews: 60,
+            growthMindset: 85,
+          },
+        },
+      ]
+
+      setUser(mockUser)
+      setUserChildren(mockChildren)
+      setSelectedChild(mockChildren[0])
+      setSetupCompleted(true)
+    }
   }, [])
 
   const login = async (email: string, password: string) => {
     // Mock login - in real app, this would call the API
     if (email === 'demo@aiguardian.com' && password === 'demo123') {
-      // Login successful
+      // Set demo mode and auto-complete setup for quick access
+      localStorage.setItem('aiguardian_demo_mode', 'true')
+      
+      const mockUser: User = {
+        id: '1',
+        email: 'parent@example.com',
+        role: 'parent',
+        displayName: 'Sarah Johnson',
+        mfaEnabled: true,
+        createdAt: '2024-01-01T00:00:00Z',
+      }
+
+      const mockChildren: Child[] = [
+        {
+          id: '1',
+          displayName: 'Emma',
+          ageBand: '8-10',
+          values: {
+            empathy: 85,
+            curiosity: 90,
+            balancedViews: 75,
+            growthMindset: 80,
+          },
+        },
+        {
+          id: '2',
+          displayName: 'Liam',
+          ageBand: '11-13',
+          values: {
+            empathy: 70,
+            curiosity: 95,
+            balancedViews: 60,
+            growthMindset: 85,
+          },
+        },
+      ]
+
+      setUser(mockUser)
+      setUserChildren(mockChildren)
+      setSelectedChild(mockChildren[0])
+      setSetupCompleted(true)
     } else {
-      throw new Error('Invalid credentials')
+      // Regular login/registration - create new user and go to setup wizard
+      const displayName = extractNameFromEmail(email)
+      const mockUser: User = {
+        id: generateUserId(),
+        email: email,
+        role: 'parent',
+        displayName: displayName,
+        mfaEnabled: false,
+        createdAt: new Date().toISOString(),
+      }
+      
+      setUser(mockUser)
+      setSetupCompleted(false) // Will show setup wizard
     }
+  }
+
+  const extractNameFromEmail = (email: string): string => {
+    const localPart = email.split('@')[0]
+    const name = localPart.replace(/[._]/g, ' ')
+    return name.split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ') || 'User'
+  }
+
+  const generateUserId = (): string => {
+    return Math.random().toString(36).substr(2, 9)
   }
 
   const logout = () => {
     setUser(null)
     setUserChildren([])
     setSelectedChild(null)
+    setSetupCompleted(false)
+    localStorage.removeItem('aiguardian_demo_mode')
   }
 
   const selectChild = (child: Child) => {
     setSelectedChild(child)
   }
 
+  const completeSetup = () => {
+    setSetupCompleted(true)
+  }
+
   const value: AuthContextType = {
     user,
     userChildren,
     selectedChild,
+    setupCompleted,
     login,
     logout,
     selectChild,
+    completeSetup,
     isAuthenticated: !!user,
   }
 
